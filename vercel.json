@@ -1,16 +1,21 @@
 {
   "buildCommand": "bun run build:vercel",
+  "installCommand": "npx pnpm@10.26.2 install --prefer-offline --frozen-lockfile",
   "headers": [
     {
       "source": "/_spa/(.*)",
       "headers": [
         {
           "key": "Cache-Control",
-          "value": "public, max-age=86400, s-maxage=86400, stale-while-revalidate=604800, stale-if-error=86400, immutable"
+          "value": "public, max-age=31536000, s-maxage=31536000, stale-while-revalidate=604800, stale-if-error=2592000, immutable"
         },
         {
           "key": "CDN-Cache-Control",
-          "value": "public, max-age=86400, s-maxage=86400, stale-while-revalidate=604800, stale-if-error=86400, immutable"
+          "value": "public, max-age=31536000, s-maxage=31536000, stale-while-revalidate=604800, stale-if-error=2592000, immutable"
+        },
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
         }
       ]
     },
@@ -47,9 +52,47 @@
           "value": "0"
         }
       ]
+    },
+    {
+      "source": "/(.*\\.(js|css|map))",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, s-maxage=31536000, immutable"
+        },
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        }
+      ]
+    },
+    {
+      "source": "/(.*\\.(png|jpg|jpeg|gif|svg|webp|ico|woff|woff2|ttf|eot))",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, s-maxage=31536000, immutable"
+        },
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        }
+      ]
+    },
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0"
+        },
+        {
+          "key": "Pragma",
+          "value": "no-cache"
+        }
+      ]
     }
   ],
-  "installCommand": "npx pnpm@10.26.2 install",
   "rewrites": [
     {
       "source": "/_dangerous_local_dev_proxy",
@@ -59,5 +102,13 @@
       "source": "/_dangerous_local_dev_proxy/:path*",
       "destination": "/_dangerous_local_dev_proxy.html"
     }
+  ],
+  "functions": {
+    "maxDuration": 60
+  },
+  "regions": ["iad1"],
+  "outputDirectory": ".next",
+  "publicFiles": [
+    "public/**"
   ]
 }
